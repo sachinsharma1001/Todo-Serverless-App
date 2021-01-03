@@ -10,15 +10,15 @@ const todoTable = process.env.TODO_TABLE;
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   console.log("Create Todo item for a user");
 
-  const userId = 1;
+  const userId = "1";
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
-  const itemId = uuid.v4();
+  const todoId = uuid.v4();
   const createdAt = new Date().toISOString();
 
   const newItem = {
     userId,
     createdAt,
-    itemId,
+    todoId,
     ...newTodo
   }
 
@@ -35,5 +35,5 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
     body: JSON.stringify({
         newItem: newItem
     })
-}
+  }
 }

@@ -11,5 +11,29 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   const todoId = event.pathParameters.todoId
   const updatedTodo: UpdateTodoRequest = JSON.parse(event.body)
 
-  return undefined
+  await docClient.update({
+    TableName: todoTable,
+    Key: {
+      todoId
+    },
+    UpdateExpression: 'set #name = :name, dueDate = :dueDate, done = :done',
+    ExpressionAttributeNames: {
+      "#name": "name"
+    },
+    ExpressionAttributeValues: {
+      ":name": updatedTodo.name,
+      ":dueDate": updatedTodo.dueDate,
+      ":done": updatedTodo.done
+    }
+  }).promise()   
+
+  return {
+    statusCode: 201,
+    headers: {
+    'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify({
+      updatedTodo: updatedTodo
+    })
+  }
 }
