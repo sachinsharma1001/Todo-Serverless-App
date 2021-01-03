@@ -10,6 +10,11 @@ provider:
   runtime: nodejs10.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-2'}
+
+  tracing:
+    lambda: true
+    apiGateway: true
+
   environment:
     TODO_TABLE: Todos-sls-${self:provider.stage}
     INDEX_NAME: TodoIdIndex
@@ -18,8 +23,8 @@ provider:
   
 functions:
 
-  # Auth:
-  #   handler: src/lambda/auth/auth0Authorizer.handler
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
 
   GetTodos:
     handler: src/lambda/http/getTodos.handler
@@ -27,7 +32,8 @@ functions:
       - http:
           method: get
           path: todos
-          cors: true  
+          cors: true
+          auth: Auth  
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -46,6 +52,7 @@ functions:
           method: post
           path: todos
           cors: true  
+          auth: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -63,6 +70,7 @@ functions:
           method: patch
           path: todos/{todoId}
           cors: true  
+          auth: Auth
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -79,7 +87,8 @@ functions:
       - http:
           method: delete
           path: todos/{todoId}
-          cors: true  
+          cors: true 
+          auth: Auth 
     iamRoleStatements:
     - Effect: Allow
       Action:
@@ -107,6 +116,17 @@ functions:
 
 resources:
   Resources:
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
     TodoDynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
