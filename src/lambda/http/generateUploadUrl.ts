@@ -1,21 +1,20 @@
 import 'source-map-support/register';
 import { APIGatewayProxyEvent, APIGatewayProxyResult, APIGatewayProxyHandler } from 'aws-lambda';
-import * as AWS from 'aws-sdk';
+import { updateGeneratedUrl } from '../../businessLogic/Todos';
+import { TodosAws } from '../../dataLayer/TodosAws';
+import { getUserId } from '../utils';
 
-const s3 = new AWS.S3({
-  signatureVersion: 'v4'
-});
-const bucketName = process.env.IMAGES_S3_BUCKET;
+const todosAws = new TodosAws();
 
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  console.log("Return a presigned URL to upload a file for a TODO item with the provided id");
+  
+  const userId = getUserId(event);
   const todoId = event.pathParameters.todoId;
 
-  const uploadUrl = s3.getSignedUrl('putObject', {
-    Bucket: bucketName,
-    Key: todoId,
-    Expires: 300
-  });
+  const uploadUrl = await todosAws.uploadGeneratedUrl(todoId);
+  const url = await todosAws.attachmentUrl(todoId);
+
+  await updateGeneratedUrl(userId, todoId, url);
 
   return {
     statusCode: 200,

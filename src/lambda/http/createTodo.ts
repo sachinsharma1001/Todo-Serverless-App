@@ -7,16 +7,16 @@ import { getUserId } from '../utils';
 export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   const userId = getUserId(event);
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
-  
-  const newItem = createTodo(userId, newTodo);
-  
+  const newItem = await createTodo(userId, newTodo);
+
   return {
     statusCode: 201,
     headers: {
-    'Access-Control-Allow-Origin': '*'
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
-        newItem: newItem
+        item: newItem
     })
   }
 }
