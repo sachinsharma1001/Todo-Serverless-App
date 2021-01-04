@@ -21,6 +21,15 @@ provider:
     IMAGES_S3_BUCKET: todo-sachin-sls-${self:provider.stage}
     SIGNED_URL_EXPIRATION: 300
   
+custom:
+
+  documentation:
+    api:
+      info:
+        version: v1.0.0
+        title: Todo Application
+        description: Todo Serverless Application
+
 functions:
 
   Auth:
@@ -33,7 +42,7 @@ functions:
           method: get
           path: todos
           cors: true
-          auth: Auth  
+          authorizer: Auth  
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -52,7 +61,10 @@ functions:
           method: post
           path: todos
           cors: true  
-          auth: Auth
+          authorizer: Auth
+          request:
+            schema:
+              application/json: ${file(create_todo_request.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -70,7 +82,10 @@ functions:
           method: patch
           path: todos/{todoId}
           cors: true  
-          auth: Auth
+          authorizer: Auth
+          request:
+            schema:
+              application/json: ${file(update_todo_request.json)}
     iamRoleStatements:
       - Effect: Allow
         Action:
@@ -92,7 +107,7 @@ functions:
           method: delete
           path: todos/{todoId}
           cors: true 
-          auth: Auth 
+          authorizer: Auth 
     iamRoleStatements:
     - Effect: Allow
       Action:
@@ -113,6 +128,7 @@ functions:
           method: post
           path: todos/{todoId}/attachment
           cors: true
+          authorizer: Auth 
     iamRoleStatements:
       - Effect: Allow
         Action:
