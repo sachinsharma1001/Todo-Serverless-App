@@ -4,10 +4,10 @@ const AWSXRay = require('aws-xray-sdk')
 import { TodoItem } from '../models/TodoItem';
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest';
 // import { TodoUpdate } from '../models/TodoUpdate';
-import { createLogger } from '../utils/logger';
+// import { createLogger } from '../utils/logger';
 
 const XAWS = AWSXRay.captureAWS(AWS);
-const logger = createLogger("TodoAccess");
+// const logger = createLogger("TodoAccess");
 
 export class TodosAccess {
 
@@ -18,7 +18,7 @@ export class TodosAccess {
     ) {}
 
     async getTodosItem(userId: string): Promise<TodoItem[]> {
-        logger.info("Get all TODO items for a current user");
+        // logger.info("Get all TODO items for a current user");
         
         const items = await this.docClient.query({
             TableName: this.todoTable,
@@ -74,12 +74,13 @@ export class TodosAccess {
         }).promise();
     }
 
-    async updateGeneratedS3Url(todoId: string, attachmentUrl: string) {
-
+    async updateGeneratedS3Url(userId: string, todoId: string, attachmentUrl: string) {
+        const todo = await this.getByTodoId(userId, todoId);
         await this.docClient.update({
             TableName: this.todoTable,
             Key: {
-              todoId
+                userId,
+                createdAt: todo.createdAt
             },
             UpdateExpression: 'set attachmentUrl = :attachmentUrl',
             ExpressionAttributeValues: {
