@@ -3,11 +3,10 @@ import * as AWS from 'aws-sdk';
 const AWSXRay = require('aws-xray-sdk')
 import { TodoItem } from '../models/TodoItem';
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest';
-// import { TodoUpdate } from '../models/TodoUpdate';
-// import { createLogger } from '../utils/logger';
+import { createLogger } from '../utils/logger';
 
 const XAWS = AWSXRay.captureAWS(AWS);
-// const logger = createLogger("TodoAccess");
+const logger = createLogger("TodoAccess");
 
 export class TodosAccess {
 
@@ -18,7 +17,7 @@ export class TodosAccess {
     ) {}
 
     async getTodosItem(userId: string): Promise<TodoItem[]> {
-        // logger.info("Get all TODO items for a current user");
+        logger.info("Get all TODO items for a current user");
         
         const items = await this.docClient.query({
             TableName: this.todoTable,
@@ -33,7 +32,7 @@ export class TodosAccess {
     }
 
     async createTodoItem(newItem: TodoItem) {
-        console.log("Creating todo item for user");
+        logger.info("Creating todo item for user");
 
         await this.docClient.put({
             TableName: this.todoTable,
@@ -42,6 +41,7 @@ export class TodosAccess {
     }
 
     async updateTodoItem(userId: string, todoId: string, updatedTodo: UpdateTodoRequest) {
+        logger.info("update todo item for user");
         const todo = await this.getByTodoId(userId, todoId);
 
         await this.docClient.update({
@@ -63,6 +63,7 @@ export class TodosAccess {
     }
 
     async deleteTodoItem(userId: string, todoId: string) {
+        logger.info("Deleting todo item for user");
         const todo = await this.getByTodoId(userId, todoId);
 
         await this.docClient.delete({
@@ -75,6 +76,7 @@ export class TodosAccess {
     }
 
     async updateGeneratedS3Url(userId: string, todoId: string, attachmentUrl: string) {
+        logger.info("Generating s3 url");
         const todo = await this.getByTodoId(userId, todoId);
         await this.docClient.update({
             TableName: this.todoTable,

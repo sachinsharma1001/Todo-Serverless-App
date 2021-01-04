@@ -3,7 +3,6 @@ import * as uuid from 'uuid';
 import { TodosAccess } from '../dataLayer/TodosAccess';
 import { TodosAws } from '../dataLayer/TodosAws';
 import { TodoItem } from '../models/TodoItem';
-// import { TodoUpdate } from '../models/TodoUpdate';
 import { CreateTodoRequest } from '../requests/CreateTodoRequest';
 import { UpdateTodoRequest } from '../requests/UpdateTodoRequest';
 
